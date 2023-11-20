@@ -23,7 +23,7 @@ hide_pages([
 db = mysql.connector.connect(
     host="localhost",
     user="root",
-    password="mysqlpswrd4321",
+    password="Rish@2812#$",
     database="mini_project"
 )
 
@@ -53,6 +53,13 @@ def check_manager_credentials(manager_id):
 
 # Create streamlit app
 def main():
+
+    if "session_srn" not in st.session_state:
+        st.session_state.session_srn = None
+    if "session_company_name" not in st.session_state:
+        st.session_state.session_company_name = None
+
+
     st.title("Internship Portal")
 
     # Display options for Operations
@@ -134,6 +141,14 @@ def main():
             website_link = form2.text_input("Enter the companty website link")
             start_date = form2.date_input("Enter Start Date")
             end_date = form2.date_input("Enter End Date")
+
+            duration = (end_date - start_date).days
+
+            function_query = f"SELECT GetTotalDurationForStudent('{SRN}')"
+            mycursor.execute(function_query)
+            result = mycursor.fetchone()
+            print("Total Duration:", result[0])
+
             has_errors = False  # Flag to track errors
             if form2.form_submit_button("Submit"):
                 if not (uploaded_file and internship_title and internship_type and Company_name and start_date and end_date):
@@ -141,13 +156,13 @@ def main():
                     has_errors = True  # Set the flag to True if there are errors
                 if not has_errors:  # Check if there are no errors
                     mycursor.execute("INSERT INTO COMPANY (company_name, website_link) values (%s, %s) ", (Company_name,website_link))
-                    sql = "INSERT INTO Internship (Title, start_date, end_date, Type, company_name, SRN ) VALUES (%s, %s, %s, %s, %s, %s)"
-                    values = (internship_title, start_date, end_date, internship_type, Company_name, SRN)
+                    sql = "INSERT INTO Internship (Title, start_date, end_date, Duration, Type, company_name, SRN ) VALUES (%s, %s, %s, %s, %s, %s, %s)"
+                    values = (internship_title, start_date, end_date, duration, internship_type, Company_name, SRN)
                     mycursor.execute(sql, values)
                     
                     db.commit()
                     st.session_state.session_company_name =  Company_name
-                    st.success("Submitted successfully")
+                    st.success("Submitted successfully. Duration: {} days".format(duration))
 
             # Add a "Next" button to navigate to the "manager_info" page
             if st.button("Next"):
