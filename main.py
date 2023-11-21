@@ -6,6 +6,8 @@ import subprocess
 import manager
 from st_pages import Page, show_pages, hide_pages
 
+
+
 show_pages([
     Page("main.py", "Main"),
     Page("manager.py", "Manager"),
@@ -61,6 +63,7 @@ def main():
 
 
     st.title("Internship Portal")
+
 
     # Display options for Operations
     option = st.sidebar.selectbox("Select User Role", ("Admin", "Manager", "Student"))
@@ -155,7 +158,7 @@ def main():
                     st.error("Please fill in all the compulsory fields (File Upload, Internship Title, Internship Type, SRN).")
                     has_errors = True  # Set the flag to True if there are errors
                 if not has_errors:  # Check if there are no errors
-                    mycursor.execute("INSERT INTO COMPANY (company_name, website_link) values (%s, %s) ", (Company_name,website_link))
+                    mycursor.execute("INSERT INTO Company (company_name, website_link) values (%s, %s) ON DUPLICATE KEY UPDATE company_name=VALUES(company_name)", (Company_name, website_link))
                     sql = "INSERT INTO Internship (Title, start_date, end_date, Duration, Type, company_name, SRN ) VALUES (%s, %s, %s, %s, %s, %s, %s)"
                     values = (internship_title, start_date, end_date, duration, internship_type, Company_name, SRN)
                     mycursor.execute(sql, values)
