@@ -4,6 +4,8 @@ from streamlit_extras.switch_page_button import switch_page
 
 from st_pages import Page, show_pages, hide_pages
 
+
+
 show_pages([
     Page("home.py", "Home"),
     Page("application_form.py", "Application")
@@ -13,7 +15,7 @@ show_pages([
 db = mysql.connector.connect(
     host="localhost",
     user="root",
-    password="mysqlpswrd4321",
+    password="Rish@2812#$",
     database="mini_project"
 )
 
@@ -27,6 +29,14 @@ hide_pages(['Application'])
 def main():
     st.title("Internship Portal")
 
+    css_bg_color = """
+        <style>
+            .streamlit-container {
+                background-color: #f0f0f0;  /* Replace with your desired color code */
+            }
+        </style>
+    """
+    st.markdown(css_bg_color, unsafe_allow_html=True)
     # Display options for Operations
     option = st.sidebar.selectbox("Select User Role", ("Admin", "Manager", "Student"))
 
