@@ -2,6 +2,8 @@ import mysql.connector
 import streamlit as st
 import pandas as pd
 
+
+
 # Establishing a connection
 db = mysql.connector.connect(
     host="localhost",
@@ -72,6 +74,7 @@ def main():
                     I.end_date AS Internship_End_Date,
                     I.Title AS Internship_Title,
                     I.Type AS Internship_Type,
+                    I.Duration AS Internship_Duration,
                     C.company_name,
                     C.website_link
                 FROM
@@ -108,8 +111,9 @@ def main():
                 st.write(f"Internship End Date: {result[0][9]}")
                 st.write(f"Internship Title: {result[0][10]}")
                 st.write(f"Internship Type: {result[0][11]}")
-                st.write(f"Company Name: {result[0][12]}")
-                st.write(f"Company website link: {result[0][13]}")
+                st.write(f"Internship Duration: {result[0][12]} days")
+                st.write(f"Company Name: {result[0][13]}")
+                st.write(f"Company website link: {result[0][14]}")
             
                 # Approval/Disapproval functionality
                 action = st.radio("Action", ["Approve", "Disapprove"])
