@@ -3,11 +3,12 @@ import streamlit as st
 import random
 
 
+
 # Establishing a connection
 db = mysql.connector.connect(
     host="localhost",
     user="root",
-    password="mysqlpswrd4321",
+    password="Rish@2812#$",
     database="mini_project"
 )
 
@@ -56,27 +57,30 @@ def main():
         else:
             mycursor.execute("SELECT manager_id from manager_srn_map where SRN = %s",(manager_srn,))
             existing_mgr = mycursor.fetchone()
-            manager_id = existing_mgr[0]
-            # Check if the SRN exists in the database before submitting the review
-            sql_check_srn = "SELECT 1 FROM Student WHERE SRN = %s"
-            mycursor.execute(sql_check_srn, (manager_srn,))
+
+            if existing_mgr is not None: 
+                manager_id = existing_mgr[0]
+                # Check if the SRN exists in the database before submitting the review
+                sql_check_srn = "SELECT 1 FROM Student WHERE SRN = %s"
+                mycursor.execute(sql_check_srn, (manager_srn,))
             
-            if mycursor.fetchone():
-                # Insert the review into the database with manager_id
-                rating = (confidence_rating + proactive_rating + learning_rating + skill_set_rating +
+                if mycursor.fetchone():
+                    # Insert the review into the database with manager_id
+                    rating = (confidence_rating + proactive_rating + learning_rating + skill_set_rating +
                             delivery_rating + documentation_rating + communication_rating + coordination_rating +
                             initiative_rating + overall_rating) / 10
-                sql = "INSERT INTO manager_review (manager_id, SRN, rating, feedback) VALUES (%s, %s, %s, %s)"
-                values = (manager_id, manager_srn, rating, feedback)
-                mycursor.execute(sql, values)
-                db.commit()
-                st.success("Review submitted successfully!")
-                st.write("")
-                if st.button("New Review"):
-                    switch_page("manager_form")
+                    sql = "INSERT INTO manager_review (manager_id, SRN, rating, feedback) VALUES (%s, %s, %s, %s)"
+                    values = (manager_id, manager_srn, rating, feedback)
+                    mycursor.execute(sql, values)
+                    db.commit()
+                    st.success("Review submitted successfully!")
+                    st.write("")
+                    if st.button("New Review"):
+                        switch_page("manager_form")
+                else:
+                    st.error(f"Student with SRN {manager_srn} does not exist.")
             else:
-                st.error(f"Student with SRN {manager_srn} does not exist.")
-
+                st.error(f"Manager with SRN {manager_srn} does not exist.")
 
 if __name__=="__main__":
     main()
