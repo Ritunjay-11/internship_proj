@@ -1,17 +1,43 @@
 import mysql.connector
 import streamlit as st
 import pandas as pd
-
-
+import smtplib
+import ssl
+from email.message import EmailMessage
 
 # Establishing a connection
 db = mysql.connector.connect(
     host="localhost",
     user="root",
-    password="Rish@2812#$",
+    password="mysqlpswrd4321",
     database="mini_project"
 )
 
+def send_manager_email(manager_email, manager_id, student_srn):
+    email_sender = 'trialdemo113445@gmail.com'
+    email_password = 'ipnm rtch eqkc zzgg'
+
+    subject = 'Manager Login Information for Internship'
+    body = f"""
+    Good Morning!
+    Greetings from PES University!
+    This email contains login information for the student internship for your intern at PES University
+    Please refer to the following for login and provide your evaluation for the different fields provided:
+    Manager ID: {manager_id}
+    Student SRN: {student_srn}
+    """
+
+    em = EmailMessage()
+    em['From'] = email_sender
+    em['To'] = manager_email
+    em['Subject'] = subject
+    em.set_content(body)
+
+    context = ssl.create_default_context()
+
+    with smtplib.SMTP_SSL('smtp.gmail.com', 465, context=context) as smtp:
+        smtp.login(email_sender, email_password)
+        smtp.sendmail(email_sender, manager_email, em.as_string())
 mycursor = db.cursor()
 print("Connection Established")
 
@@ -74,7 +100,6 @@ def main():
                     I.end_date AS Internship_End_Date,
                     I.Title AS Internship_Title,
                     I.Type AS Internship_Type,
-                    I.Duration AS Internship_Duration,
                     C.company_name,
                     C.website_link
                 FROM
@@ -98,23 +123,36 @@ def main():
             result = mycursor.fetchall()
 
             if result:
+                st.markdown("""<style>div.Widget.row-widget.stRadio > div{flex-direction: column; border: 2px solid #ddd; border-radius: 8px; padding: 10px;}</style>""", unsafe_allow_html=True)
                 st.title("Student and Manager Information:")
-                st.write(f"SRN: {result[0][0]}")
-                st.write(f"Student Name: {result[0][1]}")
-                st.write(f"Student Email: {result[0][2]}")
-                st.write(f"Manager ID: {result[0][3]}")
-                st.write(f"Manager Name: {result[0][4]}")
-                st.write(f"Manager Email: {result[0][5]}")
-                st.write(f"Manager Rating: {result[0][6]}")
-                st.write(f"Manager Feedback: {result[0][7]}")
-                st.write(f"Internship Start Date: {result[0][8]}")
-                st.write(f"Internship End Date: {result[0][9]}")
-                st.write(f"Internship Title: {result[0][10]}")
-                st.write(f"Internship Type: {result[0][11]}")
-                st.write(f"Internship Duration: {result[0][12]} days")
-                st.write(f"Company Name: {result[0][13]}")
-                st.write(f"Company website link: {result[0][14]}")
-            
+                st.subheader("Student Details:")
+                st.write(f"- SRN: {result[0][0]}")
+                st.write(f"- Name: {result[0][1]}")
+                st.write(f"- Email: {result[0][2]}")
+
+                st.subheader("Manager Details:")
+                st.write(f"- Manager ID: {result[0][3]}")
+                st.write(f"- Manager Name: {result[0][4]}")
+                st.write(f"- Manager Email: {result[0][5]}")
+                st.write(f"- Manager Rating: {result[0][6]}")
+                st.write(f"- Manager Feedback: {result[0][7]}")
+
+                st.subheader("Internship Details:")
+                st.write(f"- Start Date: {result[0][8]}")
+                st.write(f"- End Date: {result[0][9]}")
+                st.write(f"- Title: {result[0][10]}")
+                st.write(f"- Type: {result[0][11]}")
+
+                st.subheader("Company Details:")
+                st.write(f"- Company Name: {result[0][12]}")
+                st.write(f"- Company Website: {result[0][13]}")
+                st.markdown("""<style>div.Widget.row-widget.stButton > div{border: 2px solid #ddd; border-radius: 8px; padding: 10px;}</style>""", unsafe_allow_html=True)
+
+                if st.button("Send Manager Email"):
+                    email = result[0][5]
+                    managerid = result[0][3]
+                    srn = result[0][0]
+                    send_manager_email(email,managerid,srn)
                 # Approval/Disapproval functionality
                 action = st.radio("Action", ["Approve", "Disapprove"])
 
